@@ -14,6 +14,7 @@ import (
 	dsns "github.com/ipfs/go-datastore/namespace"
 	dsq "github.com/ipfs/go-datastore/query"
 	dshelp "github.com/ipfs/go-ipfs-ds-help"
+	ipld "github.com/ipfs/go-ipld-format"
 	logging "github.com/ipfs/go-log"
 )
 
@@ -25,9 +26,6 @@ var BlockPrefix = ds.NewKey("blocks")
 // ErrHashMismatch is an error returned when the hash of a block
 // is different than expected.
 var ErrHashMismatch = errors.New("block in storage has different hash than requested")
-
-// ErrNotFound is an error returned when a block is not found.
-var ErrNotFound = errors.New("blockstore: block not found")
 
 // Blockstore wraps a Datastore block-centered methods and provides a layer
 // of abstraction which allows to add different caching strategies.
@@ -117,11 +115,11 @@ func (bs *blockstore) HashOnRead(enabled bool) {
 func (bs *blockstore) Get(k cid.Cid) (blocks.Block, error) {
 	if !k.Defined() {
 		log.Error("undefined cid in blockstore")
-		return nil, ErrNotFound
+		return nil, ipld.ErrNotFound{k}
 	}
 	bdata, err := bs.datastore.Get(dshelp.MultihashToDsKey(k.Hash()))
 	if err == ds.ErrNotFound {
-		return nil, ErrNotFound
+		return nil, ipld.ErrNotFound{k}
 	}
 	if err != nil {
 		return nil, err
@@ -179,7 +177,7 @@ func (bs *blockstore) Has(k cid.Cid) (bool, error) {
 func (bs *blockstore) GetSize(k cid.Cid) (int, error) {
 	size, err := bs.datastore.GetSize(dshelp.MultihashToDsKey(k.Hash()))
 	if err == ds.ErrNotFound {
-		return -1, ErrNotFound
+		return -1, ipld.ErrNotFound{k}
 	}
 	return size, err
 }

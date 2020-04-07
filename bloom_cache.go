@@ -9,6 +9,7 @@ import (
 	bloom "github.com/ipfs/bbloom"
 	blocks "github.com/ipfs/go-block-format"
 	cid "github.com/ipfs/go-cid"
+	ipld "github.com/ipfs/go-ipld-format"
 	metrics "github.com/ipfs/go-metrics-interface"
 )
 
@@ -153,7 +154,7 @@ func (b *bloomcache) GetSize(k cid.Cid) (int, error) {
 
 func (b *bloomcache) Get(k cid.Cid) (blocks.Block, error) {
 	if has, ok := b.hasCached(k); ok && !has {
-		return nil, ErrNotFound
+		return nil, ipld.ErrNotFound{k}
 	}
 
 	return b.blockstore.Get(k)
