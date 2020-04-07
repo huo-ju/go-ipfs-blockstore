@@ -35,9 +35,9 @@ func bloomCached(ctx context.Context, bs Blockstore, bloomSize, hashCount int) (
 		if err != nil {
 			select {
 			case <-ctx.Done():
-				log.Warning("Cache rebuild closed by context finishing: ", err)
+				logger.Warning("Cache rebuild closed by context finishing: ", err)
 			default:
-				log.Error(err)
+				logger.Error(err)
 			}
 			return
 		}
@@ -88,7 +88,7 @@ func (b *bloomcache) Wait(ctx context.Context) error {
 }
 
 func (b *bloomcache) build(ctx context.Context) error {
-	evt := log.EventBegin(ctx, "bloomcache.build")
+	evt := logger.EventBegin(ctx, "bloomcache.build")
 	defer evt.Done()
 	defer close(b.buildChan)
 
@@ -125,7 +125,7 @@ func (b *bloomcache) DeleteBlock(k cid.Cid) error {
 func (b *bloomcache) hasCached(k cid.Cid) (has bool, ok bool) {
 	b.total.Inc()
 	if !k.Defined() {
-		log.Error("undefined in bloom cache")
+		logger.Error("undefined in bloom cache")
 		// Return cache invalid so call to blockstore
 		// in case of invalid key is forwarded deeper
 		return false, false

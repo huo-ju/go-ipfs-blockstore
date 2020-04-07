@@ -54,7 +54,7 @@ func (b *arccache) DeleteBlock(k cid.Cid) error {
 func (b *arccache) hasCached(k cid.Cid) (has bool, size int, ok bool) {
 	b.total.Inc()
 	if !k.Defined() {
-		log.Error("undefined cid in arccache")
+		logger.Error("undefined cid in arccache")
 		// Return cache invalid so the call to blockstore happens
 		// in case of invalid key and correct error is created.
 		return false, -1, false
@@ -108,7 +108,7 @@ func (b *arccache) GetSize(k cid.Cid) (int, error) {
 
 func (b *arccache) Get(k cid.Cid) (blocks.Block, error) {
 	if !k.Defined() {
-		log.Error("undefined cid in arc cache")
+		logger.Error("undefined cid in arc cache")
 		return nil, ipld.ErrNotFound{k}
 	}
 
