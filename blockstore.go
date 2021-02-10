@@ -111,9 +111,13 @@ type gcBlockstore struct {
 
 // NewBlockstore returns a default Blockstore implementation
 // using the provided datastore.Batching backend.
-func NewBlockstore(d ds.Batching) Blockstore {
+func NewBlockstore(d ds.Batching, blockprefix ...string) Blockstore {
 	var dsb ds.Batching
-	dd := dsns.Wrap(d, BlockPrefix)
+	dsprefix := BlockPrefix
+	if len(blockprefix) == 1 {
+		dsprefix = ds.NewKey(blockprefix[0])
+	}
+	dd := dsns.Wrap(d, dsprefix)
 	dsb = dd
 	return &blockstore{
 		datastore: dsb,
